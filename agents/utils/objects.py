@@ -226,3 +226,13 @@ class Article(BaseModel):
     urlToImage: Optional[str]
     publishedAt: Optional[str]
     content: Optional[str]
+
+
+class ExpiringMarketReportItem(BaseModel):
+    market_id: int
+    question: str
+    expiration_date: str  # Keep as string for now, conversion to datetime will be handled in the reporter
+    days_remaining: int # New field
+    odds: list[float]
+    news_articles: list[Article]
+    action_filed: str
