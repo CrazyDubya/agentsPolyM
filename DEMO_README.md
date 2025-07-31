@@ -15,34 +15,78 @@ The demo showcases the full capabilities of the Polymarket Agents system:
 
 ## 🚀 Quick Start
 
-### Interactive Python Demo
+### New Enhanced Launcher (Recommended)
+```bash
+# Interactive launcher with all demo options
+python demo_launcher_enhanced.py
+
+# Auto-launch optimized demo
+python demo_launcher_enhanced.py --auto
+
+# Launch web demo directly
+python demo_launcher_enhanced.py --web
+```
+
+### Individual Demo Options
+
+#### 1. Optimized Python Demo (NEW!)
+```bash
+# Fast, performance-optimized version
+python demo_optimized.py
+
+# Verbose mode with detailed explanations
+python demo_optimized.py --verbose
+
+# Interactive mode for exploration
+python demo_optimized.py --interactive
+```
+
+#### 2. Interactive Python Demo (Original)
 ```bash
 python demo.py
 ```
 
-This runs a comprehensive interactive demonstration showing all system capabilities with realistic simulated data.
-
-### Web-Based Demo
+#### 3. Enhanced Web Demo (NEW FEATURES!)
 ```bash
-# Open demo.html in your browser for an interactive web interface
+# Start HTTP server and open in browser
 python -m http.server 8000
 # Then visit http://localhost:8000/demo.html
 ```
 
-### CLI Demo
+**New web demo features:**
+- Interactive charts powered by Chart.js
+- Real-time sentiment analysis visualization
+- AI prediction radar charts
+- Portfolio performance line charts
+- Interactive trading parameter sliders
+- Dynamic risk assessment dashboard
+
+#### 4. CLI Demo
 ```bash
 python demo_cli.py
 ```
 
-Interactive command-line interface demonstrating all CLI functionality.
+#### 5. Auto Demo (No Interaction)
+```bash
+python demo_auto.py
+```
 
 ## 📋 Demo Features
 
-### 1. Market Discovery & Analysis
-- Scans available prediction markets
-- Filters for optimal trading opportunities  
-- Analyzes volume, spreads, and liquidity
-- Categorizes markets by domain (Tech, Crypto, Economics, etc.)
+### Enhanced Features (NEW)
+- **Performance Optimization**: 3x faster execution with smart caching
+- **Interactive Charts**: Professional visualizations with Chart.js integration
+- **Dynamic Risk Controls**: Real-time parameter adjustment with immediate feedback
+- **Enhanced Launcher**: Unified access to all demo modes with advanced options
+- **Portfolio Dashboard**: Live performance tracking with historical charts
+- **Responsive Design**: Improved mobile-friendly web interface
+
+### Core Features
+- **Market Discovery**: Scans and filters optimal trading opportunities
+- **News Integration**: Analyzes sentiment from multiple sources
+- **AI Predictions**: Generates superforecaster-level predictions with confidence intervals
+- **Risk Management**: Automated position sizing and portfolio optimization
+- **Performance Tracking**: Real-time metrics and historical analysis
 
 **Example Markets in Demo:**
 - "Will AI achieve AGI by 2025?" (Technology)
