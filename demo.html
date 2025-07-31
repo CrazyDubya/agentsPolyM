@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polymarket Agents - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: #5a67d8;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .market-card {
+            border-left: 4px solid #48bb78;
+        }
+
+        .prediction-card {
+            border-left: 4px solid #ed8936;
+        }
+
+        .performance-card {
+            border-left: 4px solid #9f7aea;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .outcome-bar {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .outcome-label {
+            min-width: 60px;
+            font-weight: 500;
+        }
+
+        .outcome-probability {
+            margin-left: 10px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .status {
+            text-align: center;
+            color: white;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #5a67d8;
+        }
+
+        .prediction-result {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .confidence-high { color: #38a169; }
+        .confidence-medium { color: #ed8936; }
+        .confidence-low { color: #e53e3e; }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #5a67d8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Polymarket Agents</h1>
+            <p>AI-Powered Prediction Market Analysis Demo</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="startDemo()" id="startBtn">Start Demo</button>
+            <button class="btn" onclick="resetDemo()" id="resetBtn" disabled>Reset</button>
+            <button class="btn" onclick="runFullAnalysis()" id="analysisBtn" disabled>Run Full Analysis</button>
+        </div>
+
+        <div class="status" id="status">Click "Start Demo" to begin market analysis</div>
+
+        <div class="demo-grid">
+            <!-- Market Analysis Card -->
+            <div class="card market-card">
+                <h3>📊 Market Analysis</h3>
+                <div id="marketData">
+                    <p>No market data loaded. Start the demo to analyze prediction markets.</p>
+                </div>
+            </div>
+
+            <!-- AI Predictions Card -->
+            <div class="card prediction-card">
+                <h3>🤖 AI Predictions</h3>
+                <div id="predictionData">
+                    <p>AI prediction engine ready. Waiting for market data...</p>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Card -->
+            <div class="card performance-card">
+                <h3>📈 Performance Metrics</h3>
+                <div id="performanceData">
+                    <div class="metric">
+                        <span>Total Predictions:</span>
+                        <span class="metric-value" id="totalPredictions">0</span>
+                    </div>
+                    <div class="metric">
+                        <span>Accuracy Rate:</span>
+                        <span class="metric-value" id="accuracyRate">0%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Avg Confidence:</span>
+                        <span class="metric-value" id="avgConfidence">0%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Volume Analyzed:</span>
+                        <span class="metric-value" id="volumeAnalyzed">$0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Demo Mode - No real trades executed | MIT License | Polymarket Agents Framework</p>
+        </div>
+    </div>
+
+    <script>
+        // Demo data and state
+        let demoState = {
+            isRunning: false,
+            currentMarketIndex: 0,
+            totalPredictions: 0,
+            successfulPredictions: 0,
+            totalVolume: 0,
+            avgConfidence: 0
+        };
+
+        const sampleMarkets = [
+            {
+                id: "market_001",
+                question: "Will Bitcoin reach $100,000 by end of 2024?",
+                description: "This market resolves to 'Yes' if Bitcoin (BTC) reaches or exceeds $100,000 USD on any major exchange before January 1, 2025.",
+                outcomes: ["Yes", "No"],
+                prices: [0.35, 0.65],
+                volume: 450000,
+                category: "Economics"
+            },
+            {
+                id: "market_002", 
+                question: "Will OpenAI release GPT-5 in 2024?",
+                description: "This market resolves to 'Yes' if OpenAI officially announces and releases a model called GPT-5 before January 1, 2025.",
+                outcomes: ["Yes", "No"],
+                prices: [0.28, 0.72],
+                volume: 320000,
+                category: "Technology"
+            },
+            {
+                id: "market_003",
+                question: "Will the S&P 500 end 2024 above 5000?",
+                description: "This market resolves based on the closing price of the S&P 500 index on the last trading day of 2024.",
+                outcomes: ["Yes", "No"],
+                prices: [0.62, 0.38],
+                volume: 780000,
+                category: "Economics"
+            },
+            {
+                id: "market_004",
+                question: "Will there be a major AI breakthrough announced in 2024?",
+                description: "This market resolves to 'Yes' if a significant AI advancement is announced by a major tech company or research institution.",
+                outcomes: ["Yes", "No"],
+                prices: [0.73, 0.27],
+                volume: 210000,
+                category: "Technology"
+            },
+            {
+                id: "market_005",
+                question: "Will the next US President be from the Democratic Party?",
+                description: "This market resolves based on the party affiliation of the winner of the next US Presidential election.",
+                outcomes: ["Yes", "No"],
+                prices: [0.48, 0.52],
+                volume: 920000,
+                category: "Politics"
+            }
+        ];
+
+        function startDemo() {
+            demoState.isRunning = true;
+            demoState.currentMarketIndex = 0;
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('resetBtn').disabled = false;
+            document.getElementById('analysisBtn').disabled = false;
+            
+            updateStatus("🔄 Demo started! Loading market data...");
+            
+            setTimeout(() => {
+                loadNextMarket();
+            }, 1000);
+        }
+
+        function resetDemo() {
+            demoState = {
+                isRunning: false,
+                currentMarketIndex: 0,
+                totalPredictions: 0,
+                successfulPredictions: 0,
+                totalVolume: 0,
+                avgConfidence: 0
+            };
+            
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('resetBtn').disabled = true;
+            document.getElementById('analysisBtn').disabled = true;
+            
+            document.getElementById('marketData').innerHTML = '<p>No market data loaded. Start the demo to analyze prediction markets.</p>';
+            document.getElementById('predictionData').innerHTML = '<p>AI prediction engine ready. Waiting for market data...</p>';
+            
+            updatePerformanceMetrics();
+            updateStatus("Demo reset. Click 'Start Demo' to begin.");
+        }
+
+        function loadNextMarket() {
+            if (demoState.currentMarketIndex >= sampleMarkets.length) {
+                updateStatus("✅ All markets analyzed! Click 'Run Full Analysis' for comprehensive report.");
+                return;
+            }
+
+            const market = sampleMarkets[demoState.currentMarketIndex];
+            displayMarket(market);
+            
+            setTimeout(() => {
+                generatePrediction(market);
+            }, 2000);
+        }
+
+        function displayMarket(market) {
+            updateStatus(`📊 Analyzing: ${market.question}`);
+            
+            const marketHtml = `
+                <h4>${market.question}</h4>
+                <p style="color: #666; margin: 10px 0;">${market.description}</p>
+                
+                <div style="margin: 15px 0;">
+                    ${market.outcomes.map((outcome, index) => `
+                        <div class="outcome-bar">
+                            <span class="outcome-label">${outcome}:</span>
+                            <div class="progress-bar" style="flex: 1; margin: 0 10px;">
+                                <div class="progress-fill" style="width: ${market.prices[index] * 100}%"></div>
+                            </div>
+                            <span class="outcome-probability">${(market.prices[index] * 100).toFixed(1)}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div style="margin-top: 15px; font-size: 0.9em; color: #666;">
+                    <strong>24h Volume:</strong> $${market.volume.toLocaleString()}<br>
+                    <strong>Category:</strong> ${market.category}
+                </div>
+            `;
+            
+            document.getElementById('marketData').innerHTML = marketHtml;
+        }
+
+        function generatePrediction(market) {
+            updateStatus(`🤖 AI analyzing market patterns...`);
+            
+            document.getElementById('predictionData').innerHTML = '<div style="text-align: center;"><div class="loading"></div> Processing market data...</div>';
+            
+            setTimeout(() => {
+                const prediction = simulateAIPrediction(market);
+                displayPrediction(prediction, market);
+                updatePerformanceMetrics();
+                
+                demoState.currentMarketIndex++;
+                setTimeout(() => {
+                    loadNextMarket();
+                }, 3000);
+            }, 2500);
+        }
+
+        function simulateAIPrediction(market) {
+            // Simulate AI analysis with realistic behavior
+            const currentProb = market.prices[0];
+            const aiAdjustment = (Math.random() - 0.5) * 0.3; // ±15% adjustment
+            const predictedProb = Math.max(0.05, Math.min(0.95, currentProb + aiAdjustment));
+            
+            const outcome = predictedProb > 0.5 ? market.outcomes[0] : market.outcomes[1];
+            const confidence = 0.65 + Math.random() * 0.25; // 65-90% confidence
+            
+            const reasoningTemplates = [
+                `Technical analysis indicates ${outcome} probability of ${(predictedProb * 100).toFixed(1)}% based on recent price movements.`,
+                `Market sentiment and news analysis suggest ${outcome} has a ${(predictedProb * 100).toFixed(1)}% likelihood.`,
+                `Cross-market correlation analysis supports ${outcome} with ${(predictedProb * 100).toFixed(1)}% confidence.`,
+                `Historical pattern recognition suggests ${outcome} probability of ${(predictedProb * 100).toFixed(1)}%.`
+            ];
+            
+            return {
+                outcome: outcome,
+                probability: predictedProb,
+                confidence: confidence,
+                reasoning: reasoningTemplates[Math.floor(Math.random() * reasoningTemplates.length)]
+            };
+        }
+
+        function displayPrediction(prediction, market) {
+            const confidenceClass = prediction.confidence > 0.8 ? 'confidence-high' : 
+                                   prediction.confidence > 0.6 ? 'confidence-medium' : 'confidence-low';
+            
+            const predictionHtml = `
+                <div class="prediction-result">
+                    <h4>🎯 Prediction: <span class="${confidenceClass}">${prediction.outcome}</span></h4>
+                    <p><strong>Probability:</strong> ${(prediction.probability * 100).toFixed(1)}%</p>
+                    <p><strong>Confidence:</strong> <span class="${confidenceClass}">${(prediction.confidence * 100).toFixed(1)}%</span></p>
+                    <p><strong>Reasoning:</strong> ${prediction.reasoning}</p>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 10px; background: #e6f3ff; border-radius: 5px;">
+                    <strong>💡 Trade Recommendation:</strong><br>
+                    ${generateTradeRecommendation(prediction, market)}
+                </div>
+            `;
+            
+            document.getElementById('predictionData').innerHTML = predictionHtml;
+            
+            // Update state
+            demoState.totalPredictions++;
+            if (Math.random() < 0.78) { // 78% success rate for demo
+                demoState.successfulPredictions++;
+            }
+            demoState.totalVolume += market.volume;
+            demoState.avgConfidence = (demoState.avgConfidence * (demoState.totalPredictions - 1) + prediction.confidence) / demoState.totalPredictions;
+        }
+
+        function generateTradeRecommendation(prediction, market) {
+            if (prediction.confidence < 0.6) {
+                return "⚠️ Low confidence - recommend waiting for better opportunity";
+            }
+            
+            const currentPrice = prediction.outcome === market.outcomes[0] ? market.prices[0] : market.prices[1];
+            const edge = Math.abs(prediction.probability - currentPrice);
+            
+            if (edge > 0.05) {
+                const action = prediction.probability > currentPrice ? "BUY" : "SELL";
+                const size = Math.min(15, prediction.confidence * 20); // Max 15% position
+                return `${action} ${prediction.outcome} - Target: ${(prediction.probability * 100).toFixed(1)}% | Size: ${size.toFixed(1)}% of portfolio`;
+            } else {
+                return "📊 Market fairly priced - no immediate opportunity";
+            }
+        }
+
+        function updatePerformanceMetrics() {
+            document.getElementById('totalPredictions').textContent = demoState.totalPredictions;
+            document.getElementById('accuracyRate').textContent = demoState.totalPredictions > 0 ? 
+                `${((demoState.successfulPredictions / demoState.totalPredictions) * 100).toFixed(1)}%` : '0%';
+            document.getElementById('avgConfidence').textContent = `${(demoState.avgConfidence * 100).toFixed(1)}%`;
+            document.getElementById('volumeAnalyzed').textContent = `$${demoState.totalVolume.toLocaleString()}`;
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        function runFullAnalysis() {
+            updateStatus("🔄 Running comprehensive analysis of all markets...");
+            
+            const analysisHtml = `
+                <div style="text-align: center; padding: 20px;">
+                    <h3>📋 Comprehensive Analysis Report</h3>
+                    <div style="margin: 20px 0; text-align: left;">
+                        <h4>📊 Market Coverage:</h4>
+                        <ul>
+                            <li>Total Markets Analyzed: ${sampleMarkets.length}</li>
+                            <li>Categories: Economics (40%), Technology (40%), Politics (20%)</li>
+                            <li>Total Volume: $${sampleMarkets.reduce((sum, m) => sum + m.volume, 0).toLocaleString()}</li>
+                        </ul>
+                        
+                        <h4 style="margin-top: 20px;">🎯 AI Performance:</h4>
+                        <ul>
+                            <li>Prediction Accuracy: ${((demoState.successfulPredictions / demoState.totalPredictions) * 100).toFixed(1)}%</li>
+                            <li>Average Confidence: ${(demoState.avgConfidence * 100).toFixed(1)}%</li>
+                            <li>High-Confidence Predictions: ${Math.floor(demoState.totalPredictions * 0.7)}/${demoState.totalPredictions}</li>
+                        </ul>
+                        
+                        <h4 style="margin-top: 20px;">💡 Key Insights:</h4>
+                        <ul>
+                            <li>Technology markets show highest volatility</li>
+                            <li>Economics markets have largest volume</li>
+                            <li>Cross-market correlations detected in 73% of cases</li>
+                            <li>News sentiment strongly correlates with price movements</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: #f0f4f8; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                        <strong>🎉 Demo completed successfully!</strong><br>
+                        Thank you for exploring Polymarket Agents!
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('predictionData').innerHTML = analysisHtml;
+            updateStatus("✅ Full analysis complete! All markets processed successfully.");
+        }
+
+        // Initialize the demo
+        updateStatus("Welcome to Polymarket Agents Demo! Click 'Start Demo' to begin.");
+    </script>
+</body>
+</html>
