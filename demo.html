@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polymarket Agents - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+
+        .demo-section {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .demo-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .market-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .market-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .market-question {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .market-prices {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .price-box {
+            background: #3498db;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .price-box.no {
+            background: #e74c3c;
+        }
+
+        .market-meta {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+
+        .news-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .news-item {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .news-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .news-meta {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+
+        .sentiment-indicator {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .sentiment-positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .sentiment-negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .sentiment-neutral {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .ai-analysis {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .prediction-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .confidence-bar {
+            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            background: #2ecc71;
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .trading-summary {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #2ecc71;
+        }
+
+        .metric-value.negative {
+            color: #e74c3c;
+        }
+
+        .demo-controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn.success {
+            background: #2ecc71;
+        }
+
+        .btn.success:hover {
+            background: #27ae60;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-live {
+            background: #2ecc71;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-processing {
+            background: #f39c12;
+        }
+
+        .status-complete {
+            background: #3498db;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Polymarket Agents</h1>
+            <p>AI-Powered Prediction Market Trading System - Interactive Demo</p>
+        </div>
+
+        <div class="demo-controls">
+            <button class="btn" onclick="startDemo()">Start Demo</button>
+            <button class="btn" onclick="skipToAI()" id="skipBtn" disabled>Skip to AI Analysis</button>
+            <button class="btn success" onclick="resetDemo()" id="resetBtn" disabled>Reset Demo</button>
+        </div>
+
+        <div id="step1" class="demo-section hidden">
+            <h2 class="section-title">
+                <span class="status-indicator status-processing"></span>
+                1. Market Discovery & Analysis
+            </h2>
+            <p>Scanning Polymarket for active prediction markets...</p>
+            <div id="marketGrid" class="market-grid">
+                <!-- Markets will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div id="step2" class="demo-section hidden">
+            <h2 class="section-title">
+                <span class="status-indicator status-processing"></span>
+                2. News Sentiment Integration
+            </h2>
+            <p>Analyzing news sentiment and market correlation...</p>
+            <div id="newsGrid" class="news-grid">
+                <!-- News will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div id="step3" class="demo-section hidden">
+            <h2 class="section-title">
+                <span class="status-indicator status-processing"></span>
+                3. AI Superforecaster Analysis
+            </h2>
+            <div class="ai-analysis">
+                <h3>🧠 AI Prediction Engine</h3>
+                <p>Running deep analysis using base rates, current events, and sentiment data...</p>
+                <div id="aiPredictions">
+                    <!-- AI predictions will be populated -->
+                </div>
+            </div>
+        </div>
+
+        <div id="step4" class="demo-section hidden">
+            <h2 class="section-title">
+                <span class="status-indicator status-processing"></span>
+                4. Trading Execution & Risk Management
+            </h2>
+            <div class="trading-summary">
+                <h3>📊 Portfolio Performance</h3>
+                <div id="tradingMetrics">
+                    <!-- Trading metrics will be populated -->
+                </div>
+            </div>
+        </div>
+
+        <div id="completion" class="demo-section hidden">
+            <h2 class="section-title">
+                <span class="status-indicator status-complete"></span>
+                Demo Complete!
+            </h2>
+            <div class="ai-analysis">
+                <h3>🎉 Comprehensive Analysis Complete</h3>
+                <p>The AI agent has successfully analyzed markets, integrated news sentiment, generated predictions, and executed optimal trades with risk management.</p>
+                <div class="demo-controls">
+                    <button class="btn success" onclick="exploreInteractive()">Explore Interactive Mode</button>
+                    <button class="btn" onclick="viewCode()">View Source Code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const demoData = {
+            markets: [
+                {
+                    id: "market_001",
+                    question: "Will AI achieve AGI by 2025?",
+                    description: "This market resolves to 'Yes' if an AI system demonstrates general intelligence capabilities across multiple domains by December 31, 2025.",
+                    outcomes: ["Yes", "No"],
+                    prices: [0.15, 0.85],
+                    volume: 125000.50,
+                    endTime: "2025-12-31",
+                    category: "Technology"
+                },
+                {
+                    id: "market_002",
+                    question: "Will Bitcoin reach $100,000 in 2024?",
+                    description: "This market resolves to 'Yes' if Bitcoin (BTC) reaches or exceeds $100,000 USD at any point during 2024.",
+                    outcomes: ["Yes", "No"],
+                    prices: [0.35, 0.65],
+                    volume: 89000.25,
+                    endTime: "2024-12-31",
+                    category: "Cryptocurrency"
+                },
+                {
+                    id: "market_003",
+                    question: "Will there be a recession in 2024?",
+                    description: "This market resolves to 'Yes' if the US economy experiences two consecutive quarters of negative GDP growth in 2024.",
+                    outcomes: ["Yes", "No"],
+                    prices: [0.28, 0.72],
+                    volume: 156000.75,
+                    endTime: "2024-12-31",
+                    category: "Economics"
+                }
+            ],
+            news: [
+                {
+                    title: "Major AI Breakthrough: New Model Shows Human-Level Reasoning",
+                    content: "Researchers announce breakthrough in AI reasoning capabilities, bringing AGI timeline estimates forward.",
+                    source: "TechCrunch",
+                    publishedAt: "2024-01-15 10:30:00",
+                    sentiment: 0.8,
+                    relevance: 0.9
+                },
+                {
+                    title: "Bitcoin Institutional Adoption Reaches New Highs",
+                    content: "Major corporations continue adding Bitcoin to treasury reserves, driving price momentum.",
+                    source: "CoinDesk",
+                    publishedAt: "2024-01-14 14:22:00",
+                    sentiment: 0.7,
+                    relevance: 0.85
+                },
+                {
+                    title: "Federal Reserve Signals Potential Rate Cuts",
+                    content: "Fed chairman hints at possible interest rate reductions if economic indicators worsen.",
+                    source: "Reuters",
+                    publishedAt: "2024-01-13 09:15:00",
+                    sentiment: -0.3,
+                    relevance: 0.8
+                }
+            ]
+        };
+
+        let currentStep = 0;
+        let demoRunning = false;
+
+        function startDemo() {
+            if (demoRunning) return;
+            demoRunning = true;
+            currentStep = 1;
+            
+            document.getElementById('skipBtn').disabled = false;
+            document.getElementById('resetBtn').disabled = false;
+            
+            showStep1();
+        }
+
+        function showStep1() {
+            const step1 = document.getElementById('step1');
+            step1.classList.remove('hidden');
+            step1.classList.add('fade-in');
+            
+            // Simulate loading
+            setTimeout(() => {
+                populateMarkets();
+                setTimeout(() => {
+                    updateStepStatus('step1', 'complete');
+                    showStep2();
+                }, 1000);
+            }, 2000);
+        }
+
+        function showStep2() {
+            const step2 = document.getElementById('step2');
+            step2.classList.remove('hidden');
+            step2.classList.add('fade-in');
+            
+            setTimeout(() => {
+                populateNews();
+                setTimeout(() => {
+                    updateStepStatus('step2', 'complete');
+                    showStep3();
+                }, 1500);
+            }, 1000);
+        }
+
+        function showStep3() {
+            const step3 = document.getElementById('step3');
+            step3.classList.remove('hidden');
+            step3.classList.add('fade-in');
+            
+            setTimeout(() => {
+                populateAIPredictions();
+                setTimeout(() => {
+                    updateStepStatus('step3', 'complete');
+                    showStep4();
+                }, 2000);
+            }, 1000);
+        }
+
+        function showStep4() {
+            const step4 = document.getElementById('step4');
+            step4.classList.remove('hidden');
+            step4.classList.add('fade-in');
+            
+            setTimeout(() => {
+                populateTradingMetrics();
+                setTimeout(() => {
+                    updateStepStatus('step4', 'complete');
+                    showCompletion();
+                }, 1500);
+            }, 1000);
+        }
+
+        function showCompletion() {
+            const completion = document.getElementById('completion');
+            completion.classList.remove('hidden');
+            completion.classList.add('fade-in');
+        }
+
+        function updateStepStatus(stepId, status) {
+            const step = document.getElementById(stepId);
+            const indicator = step.querySelector('.status-indicator');
+            indicator.className = `status-indicator status-${status}`;
+        }
+
+        function populateMarkets() {
+            const grid = document.getElementById('marketGrid');
+            grid.innerHTML = '';
+            
+            demoData.markets.forEach(market => {
+                const card = document.createElement('div');
+                card.className = 'market-card';
+                card.innerHTML = `
+                    <div class="market-question">${market.question}</div>
+                    <div class="market-prices">
+                        <div class="price-box">Yes $${market.prices[0].toFixed(2)}</div>
+                        <div class="price-box no">No $${market.prices[1].toFixed(2)}</div>
+                    </div>
+                    <div class="market-meta">
+                        Volume: $${market.volume.toLocaleString()} | Category: ${market.category}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function populateNews() {
+            const grid = document.getElementById('newsGrid');
+            grid.innerHTML = '';
+            
+            demoData.news.forEach(news => {
+                const item = document.createElement('div');
+                item.className = 'news-item';
+                
+                const sentimentClass = news.sentiment > 0 ? 'sentiment-positive' : 
+                                     news.sentiment < 0 ? 'sentiment-negative' : 'sentiment-neutral';
+                const sentimentText = news.sentiment > 0 ? 'Positive' : 
+                                     news.sentiment < 0 ? 'Negative' : 'Neutral';
+                
+                item.innerHTML = `
+                    <div class="news-title">${news.title}</div>
+                    <div class="news-meta">
+                        ${news.source} | ${news.publishedAt} | 
+                        <span class="sentiment-indicator ${sentimentClass}">${sentimentText}</span>
+                    </div>
+                    <div>${news.content}</div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        function populateAIPredictions() {
+            const container = document.getElementById('aiPredictions');
+            container.innerHTML = '';
+            
+            demoData.markets.forEach((market, index) => {
+                const prediction = 0.15 + Math.random() * 0.7; // Random prediction between 0.15-0.85
+                const confidence = 0.6 + Math.random() * 0.3;  // Random confidence between 0.6-0.9
+                const edge = Math.abs(prediction - market.prices[0]);
+                
+                const box = document.createElement('div');
+                box.className = 'prediction-box';
+                box.innerHTML = `
+                    <h4>${market.question}</h4>
+                    <p><strong>AI Prediction:</strong> ${(prediction * 100).toFixed(1)}% probability</p>
+                    <p><strong>Current Market:</strong> ${(market.prices[0] * 100).toFixed(1)}%</p>
+                    <p><strong>Edge Detected:</strong> ${(edge * 100).toFixed(1)}%</p>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${confidence * 100}%"></div>
+                    </div>
+                    <small>Confidence: ${(confidence * 100).toFixed(1)}%</small>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function populateTradingMetrics() {
+            const container = document.getElementById('tradingMetrics');
+            
+            const metrics = [
+                { label: 'Initial Capital', value: '$10,000.00', positive: true },
+                { label: 'Active Positions', value: '3', positive: true },
+                { label: 'Total Exposure', value: '$2,450.00', positive: true },
+                { label: 'Expected Return', value: '$387.50', positive: true },
+                { label: 'Expected ROI', value: '+3.88%', positive: true },
+                { label: 'Win Rate', value: '73.2%', positive: true },
+                { label: 'Sharpe Ratio', value: '1.84', positive: true },
+                { label: 'Max Drawdown', value: '-8.5%', positive: false }
+            ];
+            
+            container.innerHTML = metrics.map(metric => `
+                <div class="metric">
+                    <span>${metric.label}</span>
+                    <span class="metric-value ${metric.positive ? '' : 'negative'}">${metric.value}</span>
+                </div>
+            `).join('');
+        }
+
+        function skipToAI() {
+            if (!demoRunning) return;
+            // Hide all previous steps and jump to AI analysis
+            document.querySelectorAll('.demo-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            showStep3();
+        }
+
+        function resetDemo() {
+            demoRunning = false;
+            currentStep = 0;
+            
+            document.querySelectorAll('.demo-section').forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('fade-in');
+            });
+            
+            document.getElementById('skipBtn').disabled = true;
+            document.getElementById('resetBtn').disabled = true;
+        }
+
+        function exploreInteractive() {
+            alert('Interactive mode would connect to the live system with real market data and AI analysis capabilities.');
+        }
+
+        function viewCode() {
+            window.open('https://github.com/polymarket/agents', '_blank');
+        }
+
+        // Auto-start demo after 2 seconds
+        setTimeout(() => {
+            if (!demoRunning) {
+                startDemo();
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
