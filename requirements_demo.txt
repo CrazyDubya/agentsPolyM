@@ -1,0 +1,18 @@
+# Optimized requirements for Polymarket Agents Demo
+# Core dependencies
+requests>=2.25.0
+python-dotenv>=0.19.0
+pydantic>=1.8.0
+
+# Optional - only install if needed for full functionality
+# typer>=0.4.0
+# openai>=0.27.0
+# langchain>=0.0.200
+# chromadb>=0.3.0
+
+# Web3 dependencies (optional for full functionality)
+# web3>=6.0.0
+# eth-account>=0.8.0
+
+# Development tools
+pytest>=6.0.0
