@@ -48,11 +48,11 @@ class Trader:
             print(f"3. FOUND {len(markets)} MARKETS")
 
             print()
-            filtered_markets = self.agent.filter_markets_for_trading(markets)
+            filtered_markets = self.agent.filter_markets(markets)
             print(f"4. FILTERED {len(filtered_markets)} MARKETS")
 
             market = filtered_markets[0]
-            best_trade = self.agent.generate_trade_recommendation(market)
+            best_trade = self.agent.source_best_trade(market)
             print(f"5. CALCULATED TRADE {best_trade}")
 
             amount = self.agent.format_trade_prompt_for_execution(best_trade)
@@ -61,8 +61,8 @@ class Trader:
             # print(f"6. TRADED {trade}")
 
         except Exception as e:
-            print(f"Error {e} - stopping to prevent infinite recursion")
-            return None
+            print(f"Error {e} \n \n Retrying")
+            self.one_best_trade()
 
     def maintain_positions(self):
         pass

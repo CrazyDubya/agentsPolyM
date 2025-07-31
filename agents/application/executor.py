@@ -196,32 +196,3 @@ class Executor:
         result = self.llm.invoke(prompt)
         content = result.content
         return content
-    def filter_markets_for_trading(self, markets):
-        """Filter markets suitable for trading based on volume and liquidity"""
-        filtered = []
-        for market in markets:
-            # Simple filtering logic - in real implementation this would be more sophisticated
-            if hasattr(market, 'volume') and market.volume > 50000:
-                if hasattr(market, 'spread') and market.spread < 0.05:
-                    filtered.append(market)
-        return filtered
-    
-    def generate_trade_recommendation(self, market):
-        """Generate a trade recommendation for a given market"""
-        # This would normally use sophisticated analysis
-        # For demo purposes, return a simple recommendation structure
-        return {
-            'market_id': getattr(market, 'id', 'unknown'),
-            'side': 'BUY',
-            'size': 0.1,
-            'confidence': 0.7,
-            'reasoning': 'AI analysis suggests favorable odds'
-        }
-    
-    def format_trade_prompt_for_execution(self, trade_recommendation):
-        """Format trade recommendation for execution"""
-        return {
-            'amount': trade_recommendation.get('size', 0.1) * 1000,  # Convert to dollar amount
-            'side': trade_recommendation.get('side', 'BUY'),
-            'market_id': trade_recommendation.get('market_id', '')
-        }
