@@ -173,7 +173,7 @@ class AIPredictor:
         current_prob = market.current_prices[0]
         
         # AI "insight" - slight adjustment to market price
-        ai_adjustment = random.uniform(-0.15, 0.15)
+        ai_adjustment = random.uniform(self.AI_ADJUSTMENT_MIN, self.AI_ADJUSTMENT_MAX)
         predicted_prob = max(0.05, min(0.95, current_prob + ai_adjustment))
         
         outcome = market.outcomes[0] if predicted_prob > 0.5 else market.outcomes[1]
