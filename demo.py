@@ -117,8 +117,12 @@ class MockDataGenerator:
             market_data = cls.SAMPLE_MARKETS[i]
             
             # Generate realistic prices that sum to ~1.0
-            base_price = random.uniform(0.3, 0.7)
+            base_price = random.uniform(cls.PRICE_LOWER_BOUND, cls.PRICE_UPPER_BOUND)
             prices = [base_price, 1.0 - base_price]
+    
+    # Constants for price generation bounds
+    PRICE_LOWER_BOUND = 0.3
+    PRICE_UPPER_BOUND = 0.7
             
             market = DemoMarket(
                 id=f"market_{i+1:03d}",
