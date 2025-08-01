@@ -488,7 +488,7 @@
             
             if (edge > 0.05) {
                 const action = prediction.probability > currentPrice ? "BUY" : "SELL";
-                const size = Math.min(15, prediction.confidence * 20); // Max 15% position
+                const size = Math.min(MAX_POSITION_PERCENTAGE, prediction.confidence * CONFIDENCE_SCALING_FACTOR); // Max 15% position
                 return `${action} ${prediction.outcome} - Target: ${(prediction.probability * 100).toFixed(1)}% | Size: ${size.toFixed(1)}% of portfolio`;
             } else {
                 return "📊 Market fairly priced - no immediate opportunity";
