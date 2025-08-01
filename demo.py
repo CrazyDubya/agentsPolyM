@@ -221,7 +221,7 @@ class PerformanceMonitor:
         )
         
         # Simulate success rate (70-85% for demo)
-        if random.random() < 0.78:
+        if random.random() < self.SIMULATED_SUCCESS_RATE:
             self.metrics["successful_predictions"] += 1
         
         self.metrics["accuracy_rate"] = (
