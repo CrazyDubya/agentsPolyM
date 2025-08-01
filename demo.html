@@ -432,7 +432,7 @@
             const predictedProb = Math.max(0.05, Math.min(0.95, currentProb + aiAdjustment));
             
             const outcome = predictedProb > 0.5 ? market.outcomes[0] : market.outcomes[1];
-            const confidence = 0.65 + Math.random() * 0.25; // 65-90% confidence
+            const confidence = BASE_CONFIDENCE + Math.random() * CONFIDENCE_RANGE; // 65-90% confidence
             
             const reasoningTemplates = [
                 `Technical analysis indicates ${outcome} probability of ${(predictedProb * 100).toFixed(1)}% based on recent price movements.`,
