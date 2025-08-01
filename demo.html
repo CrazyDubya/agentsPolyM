@@ -423,10 +423,12 @@
             }, 2500);
         }
 
+        const AI_ADJUSTMENT_RANGE = 0.3; // ±15% adjustment range
+
         function simulateAIPrediction(market) {
             // Simulate AI analysis with realistic behavior
             const currentProb = market.prices[0];
-            const aiAdjustment = (Math.random() - 0.5) * 0.3; // ±15% adjustment
+            const aiAdjustment = (Math.random() - 0.5) * AI_ADJUSTMENT_RANGE;
             const predictedProb = Math.max(0.05, Math.min(0.95, currentProb + aiAdjustment));
             
             const outcome = predictedProb > 0.5 ? market.outcomes[0] : market.outcomes[1];
