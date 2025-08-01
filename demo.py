@@ -357,7 +357,7 @@ class PolymarketAgentsDemo:
         
         # Determine trade parameters based on prediction
         if prediction.confidence > 0.7:
-            recommended_size = min(0.15, prediction.confidence * 0.2)  # Max 15% of portfolio
+            recommended_size = min(self.MAX_PORTFOLIO_ALLOCATION, prediction.confidence * self.CONFIDENCE_SCALING_FACTOR)  # Max 15% of portfolio
             
             if prediction.outcome == market.outcomes[0]:
                 side = "BUY" if market.current_prices[0] < prediction.probability else "SELL"
