@@ -471,7 +471,7 @@
             
             // Update state
             demoState.totalPredictions++;
-            if (Math.random() < 0.78) { // 78% success rate for demo
+            if (Math.random() < DEMO_SUCCESS_RATE) { // Use named constant for success rate
                 demoState.successfulPredictions++;
             }
             demoState.totalVolume += market.volume;
